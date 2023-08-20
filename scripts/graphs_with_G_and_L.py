@@ -144,9 +144,6 @@ if __name__=="__main__":
 
     #length of tree with and without duplication
     total_len = tree_file.total_branch_length()
-    print(total_len)
-
-
 
     """ratio of nonsynonymous mutations in G to nonsynonymous in F is higher than synonymous G to synonymous F"""
     df1 = non_synonymous_or_synonymous(args.ref, args.aa, args.nt)
