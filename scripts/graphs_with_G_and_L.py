@@ -67,7 +67,8 @@ def AA_Mutations(aamutations, ntmutations):
                 aa_m[gene]=flatlist
     return(aa_m)
 
-def scaled_mutations(reffile):
+def scaled_mutations(reffile, type):
+    """This function finds the ratios of possible synonymous and nonsynonymous sites in the reference for all CDS regions"""
     read_ref = SeqIO.read(reffile, "genbank")
     cds_, sequence_ref_cds = (dict() for i in range(2))
     for feature in read_ref.features:
@@ -90,10 +91,13 @@ def scaled_mutations(reffile):
 
     nonsyn_ratio = nonsynonymous_possibilities/(nonsynonymous_possibilities+synonymous_possibilities)
     syn_ratio = synonymous_possibilities/(nonsynonymous_possibilities+synonymous_possibilities)
-    return(nonsyn_ratio, syn_ratio)
+    if type == "nonsyn": return(nonsyn_ratio)
+    if type == "syn": return(syn_ratio)
+
 
 def non_synonymous_or_synonymous(reffile, aa_muts, nt_muts):
-    non_ratio, syn_ratio = scaled_mutations(reffile)
+    non_ratio = scaled_mutations(reffile, "nonsyn")
+    syn_ratio = scaled_mutations(reffile, "syn")
     aa_mutations = AA_Mutations(aa_muts, nt_muts)
     mutations_in_genes = MutationsineachGene(aa_muts, nt_muts)
     synonymousmutations, nonsynonymousmutations, ratios, sel =([] for i in range(4))
@@ -148,8 +152,8 @@ if __name__=="__main__":
     """ratio of nonsynonymous mutations in G to nonsynonymous in F is higher than synonymous G to synonymous F"""
     df1 = non_synonymous_or_synonymous(args.ref, args.aa, args.nt)
     df1.to_csv(args.table)
-    ratio_nonsyn = scaled_mutations(args.ref)[0]
-    ratio_syn = scaled_mutations(args.ref)[1]
+    ratio_nonsyn = scaled_mutations(args.ref, "nonsyn")
+    ratio_syn = scaled_mutations(args.ref, "syn")
 
     with open(args.aa) as f:
         gene_length=[]
